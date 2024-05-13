@@ -33,7 +33,8 @@
   },
   "dependencies": {
     "@jaypie/core": "^1.0.29",
-    "@jaypie/lambda": "^1.0.4"
+    "@jaypie/lambda": "^1.0.4",
+    "@jaypie/testkit": "^1.0.18"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
