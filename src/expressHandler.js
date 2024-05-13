@@ -1,11 +1,10 @@
 import {
   JAYPIE,
+  jaypieHandler,
   log as publicLogger,
   ConfigurationError,
   UnhandledError,
 } from "@jaypie/core";
-
-import { lambdaHandler } from "@jaypie/lambda";
 
 //
 //
@@ -16,7 +15,6 @@ const expressHandler = (
   handler,
   { locals, name, setup, teardown, unavailable, validate } = {},
 ) => {
-
   //
   //
   // Validate
@@ -33,97 +31,23 @@ const expressHandler = (
   // Setup
   //
 
-  let jaypieFunction;
+  return async (req, res, ...params) => {
+    // * This is the first line of code that runs when a request is received
 
-  return async (event = {}, context = {}, ...args) => {
-    if (!name) {
-      // If handler has a name, use it
-      if (handler.name) {
-        name = handler.name;
-      } else {
-        name = JAYPIE.UNKNOWN;
-      }
-    }
+    // Set req.locals if it doesn't exist
+    if (!req.locals) req.locals = {};
+    if (!req.locals._jaypie) req.locals._jaypie = {};
 
-    // The public logger is also the "root" logger
-    publicLogger.tag({ handler: name });
+    // Set res.locals if it doesn't exist
+    if (!res.locals) res.locals = {};
+    if (!res.locals._jaypie) res.locals._jaypie = {};
 
-    // Very low-level, sub-trace details
-    const libLogger = publicLogger.lib({
-      lib: JAYPIE.LIB.EXPRESS,
-    });
-    libLogger.trace("[jaypie] Express init");
+    // - Set up the logger
+    // - Log request
 
-    const log = publicLogger.lib({
-      level: publicLogger.level,
-      lib: JAYPIE.LIB.EXPRESS,
-    });
+    // - Intercept the original res.json, res.send, and res.end
 
-    //
-    //
-    // Preprocess
-    //
-
-    if (!jaypieFunction) {
-      jaypieFunction = jaypieHandler(handler, {
-        name,
-        setup,
-        teardown,
-        unavailable,
-        validate,
-      });
-    }
-
-    let response;
-
-    try {
-      publicLogger.tag({ invoke: context.awsRequestId });
-
-      libLogger.trace("[jaypie] Express execution");
-      log.info.var({ event });
-
-      //
-      //
-      // Process
-      //
-
-      response = await jaypieFunction(event, context, ...args);
-
-      //
-      //
-      // Error Handling
-      //
-    } catch (error) {
-      // Jaypie or "project" errors are intentional and should be handled like expected cases
-      if (error.isProjectError) {
-        log.debug("Caught jaypie error");
-        log.var({ jaypieError: error });
-        response = error.json();
-      } else {
-        // Otherwise, flag unhandled errors as fatal
-        log.fatal("Caught unhandled error");
-        log.var({ unhandledError: error.message });
-        response = UnhandledError().json();
-      }
-    }
-
-    //
-    //
-    // Postprocess
-    //
-
-    // TODO: API Gateway proxy response
-
-    // Clean up the public logger
-    publicLogger.untag("handler");
-
-    //
-    //
-    // Return
-    //
-
-    log.info.var({ response });
-    return response;
+    const response = await handler(req, res, ...params);
   };
 };
 
