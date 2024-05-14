@@ -100,16 +100,16 @@ const expressHandler = (
       // Error Handling
       //
     } catch (error) {
-      // Jaypie or "project" errors are intentional and should be handled like expected cases
-      if (error.isProjectError) {
-        log.debug("Caught jaypie error");
-        log.var({ jaypieError: error });
-        response = error.json();
+      // In theory jaypieFunction has handled all errors
+      if (error.status) {
+        res.status(error.status);
+      }
+      if (typeof error.json === "function") {
+        res.json(error.json());
       } else {
-        // Otherwise, flag unhandled errors as fatal
-        log.fatal("Caught unhandled error");
-        log.var({ unhandledError: error.message });
-        response = UnhandledError().json();
+        // This should never happen
+        const unhandledError = new UnhandledError();
+        res.json(unhandledError.json());
       }
     }
 
