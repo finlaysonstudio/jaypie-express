@@ -81,6 +81,7 @@ const expressHandler = (
     if (!res.locals._jaypie) res.locals._jaypie = {};
 
     // TODO: Intercept the original res.json, res.send, and res.end
+    // TODO: Warn if they are used
 
     let response;
 
@@ -94,6 +95,8 @@ const expressHandler = (
       //
 
       response = await jaypieFunction(req, res, ...params);
+
+      // TODO: respond properly with JSON
 
       //
       //
