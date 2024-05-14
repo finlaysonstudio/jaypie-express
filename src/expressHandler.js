@@ -6,6 +6,9 @@ import {
   UnhandledError,
 } from "@jaypie/core";
 
+import getCurrentInvokeUuid from "./getCurrentInvokeUuid.adapter.js";
+import summarizeRequest from "./summarizeRequest.helper.js";
+
 //
 //
 // Main
@@ -31,8 +34,43 @@ const expressHandler = (
   // Setup
   //
 
+  let jaypieFunction;
+
   return async (req, res, ...params) => {
     // * This is the first line of code that runs when a request is received
+
+    // Update the public logger with the request ID
+    publicLogger.tag({ invoke: getCurrentInvokeUuid() });
+
+    // Very low-level, internal sub-trace details
+    const libLogger = publicLogger.lib({
+      lib: JAYPIE.LIB.EXPRESS,
+    });
+    libLogger.trace("[jaypie] Express init");
+
+    // Top-level, important details that run at the same level as the main logger
+    const log = publicLogger.lib({
+      level: publicLogger.level,
+      lib: JAYPIE.LIB.EXPRESS,
+    });
+
+    //
+    //
+    // Preprocess
+    //
+
+    // TODO: pass locals setup to jaypieHandler
+
+    if (!jaypieFunction) {
+      // Initialize after logging is set up
+      jaypieFunction = jaypieHandler(handler, {
+        name,
+        setup,
+        teardown,
+        unavailable,
+        validate,
+      });
+    }
 
     // Set req.locals if it doesn't exist
     if (!req.locals) req.locals = {};
@@ -42,12 +80,58 @@ const expressHandler = (
     if (!res.locals) res.locals = {};
     if (!res.locals._jaypie) res.locals._jaypie = {};
 
-    // - Set up the logger
-    // - Log request
+    // TODO: Intercept the original res.json, res.send, and res.end
 
-    // - Intercept the original res.json, res.send, and res.end
+    let response;
 
-    const response = await handler(req, res, ...params);
+    try {
+      libLogger.trace("[jaypie] Lambda execution");
+      log.info.var({ req: summarizeRequest(req) });
+
+      //
+      //
+      // Process
+      //
+
+      response = await jaypieFunction(req, res, ...params);
+
+      //
+      //
+      // Error Handling
+      //
+    } catch (error) {
+      // Jaypie or "project" errors are intentional and should be handled like expected cases
+      if (error.isProjectError) {
+        log.debug("Caught jaypie error");
+        log.var({ jaypieError: error });
+        response = error.json();
+      } else {
+        // Otherwise, flag unhandled errors as fatal
+        log.fatal("Caught unhandled error");
+        log.var({ unhandledError: error.message });
+        response = UnhandledError().json();
+      }
+    }
+
+    //
+    //
+    // Postprocess
+    //
+
+    // TODO: Decorate response headers
+
+    // Log response
+    // log.info.var({ response });
+
+    // Clean up the public logger
+    publicLogger.untag("handler");
+
+    //
+    //
+    // Return
+    //
+
+    return response;
   };
 };
 
