@@ -110,10 +110,12 @@ const expressHandler = (
       }
       if (typeof error.json === "function") {
         res.json(error.json());
+        response = error.json();
       } else {
         // This should never happen
         const unhandledError = new UnhandledError();
         res.json(unhandledError.json());
+        response = unhandledError.json();
       }
     }
 
