@@ -148,5 +148,59 @@ describe("Express Handler", () => {
   describe("Features", () => {
     it.todo("Sets the name of the name of the handler");
     it.todo("Tags the public logger with the handler name");
+    describe("Unavailable mode", () => {
+      it("Works as normal when process.env.PROJECT_UNAVAILABLE is set to false", async () => {
+        process.env.PROJECT_UNAVAILABLE = "false";
+        const mockFunction = vi.fn();
+        const handler = expressHandler(mockFunction);
+        const req = {};
+        const mockResJson = vi.fn();
+        const res = {
+          json: mockResJson,
+          on: vi.fn(),
+          status: vi.fn(() => res),
+        };
+        const next = () => {};
+        await handler(req, res, next);
+        expect(mockFunction).toHaveBeenCalledTimes(1);
+      });
+      it("Will respond with a 503 if process.env.PROJECT_UNAVAILABLE is set to true", async () => {
+        process.env.PROJECT_UNAVAILABLE = "true";
+        const mockFunction = vi.fn();
+        const handler = expressHandler(mockFunction);
+        const req = {};
+        const mockResJson = vi.fn();
+        const res = {
+          json: mockResJson,
+          on: vi.fn(),
+          status: vi.fn(() => res),
+        };
+        const next = () => {};
+        await handler(req, res, next);
+        expect(mockFunction).toHaveBeenCalledTimes(0);
+        expect(mockResJson).toHaveBeenCalledTimes(1);
+        const response = mockResJson.mock.calls[0][0];
+        expect(response).toBeJaypieError();
+        expect(response.errors[0].status).toBe(HTTP.CODE.UNAVAILABLE);
+      });
+      it("Will respond with a 503 if unavailable=true is passed to the handler", async () => {
+        const mockFunction = vi.fn();
+        const handler = expressHandler(mockFunction, { unavailable: true });
+        const req = {};
+        const mockResJson = vi.fn();
+        const res = {
+          json: mockResJson,
+          on: vi.fn(),
+          status: vi.fn(() => res),
+        };
+        const next = () => {};
+        await handler(req, res, next);
+        expect(mockFunction).toHaveBeenCalledTimes(0);
+        expect(mockResJson).toHaveBeenCalledTimes(1);
+        const response = mockResJson.mock.calls[0][0];
+        expect(response).toBeJaypieError();
+        expect(response.errors[0].status).toBe(HTTP.CODE.UNAVAILABLE);
+      });
+    });
   });
 });
