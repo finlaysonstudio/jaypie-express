@@ -33,7 +33,7 @@ describe("Express Handler", () => {
       expect(expressHandler).toBeDefined();
       expect(expressHandler).toBeFunction();
     });
-    it("Will call a function I pass it", () => {
+    it("Will call a function I pass it", async () => {
       const mockFunction = vi.fn();
       const handler = expressHandler(mockFunction);
       const req = {};
@@ -41,10 +41,10 @@ describe("Express Handler", () => {
         on: vi.fn(),
       };
       const next = () => {};
-      handler(req, res, next);
+      await handler(req, res, next);
       expect(mockFunction).toHaveBeenCalledTimes(1);
     });
-    it("Passes req, res, and anything else to the handler", () => {
+    it("Passes req, res, and anything else to the handler", async () => {
       // Set up four mock variables
       const req = {};
       const res = {
@@ -56,7 +56,7 @@ describe("Express Handler", () => {
       const mockFunction = vi.fn();
       const handler = expressHandler(mockFunction);
       // Call the handler with our mock variables
-      handler(req, res, three, four);
+      await handler(req, res, three, four);
       // Expect the mock function to have been called with our mock variables
       expect(mockFunction).toHaveBeenCalledTimes(1);
       expect(mockFunction).toHaveBeenCalledWith(req, res, three, four);
@@ -75,7 +75,7 @@ describe("Express Handler", () => {
       expect(() => expressHandler(null)).toThrow();
       expect(() => expressHandler(undefined)).toThrow();
     });
-    it("Will catch an unhandled thrown error", () => {
+    it("Will catch an unhandled thrown error", async () => {
       const mockFunction = vi.fn(() => {
         throw new Error("Sorpresa!");
       });
@@ -88,7 +88,7 @@ describe("Express Handler", () => {
         status: vi.fn(() => res),
       };
       const next = () => {};
-      handler(req, res, next);
+      await handler(req, res, next);
       expect(mockFunction).toHaveBeenCalledTimes(1);
       expect(mockResJson).toHaveBeenCalledTimes(1);
       const response = mockResJson.mock.calls[0][0];
@@ -123,7 +123,7 @@ describe("Express Handler", () => {
       // The response title will be "Internal Application Error" but we don't want to test that here
       // expect(response.errors[0].title).toBe("Internal Application Error");
     });
-    it("Will catch a thrown ProjectError and respond with the correct status code", () => {
+    it("Will catch a thrown ProjectError and respond with the correct status code", async () => {
       // Mock a function that throws NotFoundError
       const mockFunction = vi.fn(() => {
         throw new NotFoundError();
@@ -137,7 +137,7 @@ describe("Express Handler", () => {
         status: vi.fn(() => res),
       };
       const next = () => {};
-      handler(req, res, next);
+      await handler(req, res, next);
       expect(mockFunction).toHaveBeenCalledTimes(1);
       expect(mockResJson).toHaveBeenCalledTimes(1);
       const response = mockResJson.mock.calls[0][0];
