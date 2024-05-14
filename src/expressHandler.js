@@ -8,6 +8,7 @@ import {
 
 import getCurrentInvokeUuid from "./getCurrentInvokeUuid.adapter.js";
 import summarizeRequest from "./summarizeRequest.helper.js";
+import summarizeResponse from "./summarizeResponse.helper.js";
 
 //
 //
@@ -124,7 +125,9 @@ const expressHandler = (
     // TODO: Decorate response headers
 
     // Log response
-    // log.info.var({ response });
+    log.info.var({
+      res: summarizeResponse(res),
+    });
 
     // Clean up the public logger
     publicLogger.untag("handler");
