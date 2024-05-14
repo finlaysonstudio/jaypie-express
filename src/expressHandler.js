@@ -97,7 +97,25 @@ const expressHandler = (
 
       response = await jaypieFunction(req, res, ...params);
 
-      // TODO: respond properly with JSON
+      // JSONate
+      if (response) {
+        if (typeof response === "object") {
+          if (typeof response.json === "function") {
+            res.json(response.json());
+          } else {
+            res.json(response);
+          }
+        }
+        if (typeof response === "string") {
+          try {
+            res.json(JSON.parse(response));
+          } catch (error) {
+            res.send(response);
+          }
+        }
+      } else {
+        //
+      }
 
       //
       //

@@ -148,6 +148,124 @@ describe("Express Handler", () => {
   describe("Features", () => {
     it.todo("Sets the name of the name of the handler");
     it.todo("Tags the public logger with the handler name");
+    describe("Automatic response", () => {
+      it("Responds as JSON if the response is a pure object", async () => {
+        // Arrange
+        const mockFunction = vi.fn(() => ({ key: "value" }));
+        const handler = expressHandler(mockFunction);
+        const req = {};
+        const mockResJson = vi.fn();
+        const res = {
+          json: mockResJson,
+          on: vi.fn(),
+          status: vi.fn(() => res),
+        };
+        const next = () => {};
+        // Act
+        await handler(req, res, next);
+        // Assert
+        expect(mockFunction).toHaveBeenCalledTimes(1);
+        expect(mockResJson).toHaveBeenCalledTimes(1);
+      });
+      it("Responds as JSON if the response is an array", async () => {
+        // Arrange
+        const mockFunction = vi.fn(() => ["value"]);
+        const handler = expressHandler(mockFunction);
+        const req = {};
+        const mockResJson = vi.fn();
+        const res = {
+          json: mockResJson,
+          on: vi.fn(),
+          status: vi.fn(() => res),
+        };
+        const next = () => {};
+        // Act
+        await handler(req, res, next);
+        // Assert
+        expect(mockFunction).toHaveBeenCalledTimes(1);
+        expect(mockResJson).toHaveBeenCalledTimes(1);
+      });
+      it("Responds as JSON if the response is a string that casts to JSON", async () => {
+        // Arrange
+        const mockFunction = vi.fn(() => JSON.stringify({ key: "value" }));
+        const handler = expressHandler(mockFunction);
+        const req = {};
+        const mockResJson = vi.fn();
+        const res = {
+          json: mockResJson,
+          on: vi.fn(),
+          status: vi.fn(() => res),
+        };
+        const next = () => {};
+        // Act
+        await handler(req, res, next);
+        // Assert
+        expect(mockFunction).toHaveBeenCalledTimes(1);
+        expect(mockResJson).toHaveBeenCalledTimes(1);
+      });
+      it("Responds as JSON if the response has a .json() that returns an object", async () => {
+        // Arrange
+        const mockFunction = vi.fn(() => ({
+          json: () => ({ key: "value" }),
+        }));
+        const handler = expressHandler(mockFunction);
+        const req = {};
+        const mockResJson = vi.fn();
+        const res = {
+          json: mockResJson,
+          on: vi.fn(),
+          status: vi.fn(() => res),
+        };
+        const next = () => {};
+        // Act
+        await handler(req, res, next);
+        // Assert
+        expect(mockFunction).toHaveBeenCalledTimes(1);
+        expect(mockResJson).toHaveBeenCalledTimes(1);
+      });
+      it.todo(
+        "Responds as HTML if the response is a string that starts with <",
+        async () => {
+          //
+        },
+      );
+      it.todo(
+        "Responds as text if the response is a string that does not start with <",
+        async () => {
+          //
+        },
+      );
+      it.todo("Responds as no content if the response is null", async () => {
+        //
+      });
+      it.todo(
+        "Responds as no content if the response is undefined",
+        async () => {
+          //
+        },
+      );
+      it.todo("Responds as no content if the response is false", async () => {
+        //
+      });
+      it.todo("Responds as created if the response is true", async () => {
+        //
+      });
+      it.todo(
+        "Coerces everything else into string as responds as text",
+        async () => {
+          //
+        },
+      );
+      it.todo("Will not override res.json() if it was sent", async () => {
+        //
+      });
+      it.todo("Will not override res.send() if it was sent", async () => {
+        //
+      });
+      it.todo("Will not override res.status() if it was sent", async () => {
+        //
+      });
+    });
     describe("Unavailable mode", () => {
       it("Works as normal when process.env.PROJECT_UNAVAILABLE is set to false", async () => {
         process.env.PROJECT_UNAVAILABLE = "false";
