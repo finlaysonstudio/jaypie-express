@@ -30,7 +30,8 @@
     "test": "vitest",
     "test:spec:expressHandler": "vitest run ./src/__tests__/expressHandler.spec.js",
     "test:spec:getCurrentInvokeUuid.adapter": "vitest run ./src/__tests__/getCurrentInvokeUuid.adapter.spec.js",
-    "test:spec:index": "vitest run ./src/__tests__/index.spec.js"
+    "test:spec:index": "vitest run ./src/__tests__/index.spec.js",
+    "test:spec:summarizeRequest.helper": "vitest run ./src/__tests__/summarizeRequest.helper.spec.js"
   },
   "dependencies": {
     "@codegenie/serverless-express": "^4.14.1",
