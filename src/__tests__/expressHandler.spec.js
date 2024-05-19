@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { HTTP, NotFoundError } from "@jaypie/core";
 
 import getCurrentInvokeUuid from "../getCurrentInvokeUuid.adapter.js";
+import decorateResponse from "../decorateResponse.helper.js";
 
 // Subject
 import expressHandler from "../expressHandler.js";
@@ -13,6 +14,7 @@ import expressHandler from "../expressHandler.js";
 //
 
 vi.mock("../getCurrentInvokeUuid.adapter.js");
+vi.mock("../decorateResponse.helper.js");
 
 beforeEach(() => {
   getCurrentInvokeUuid.mockReturnValue("MOCK_UUID");
@@ -166,6 +168,7 @@ describe("Express Handler", () => {
         // Assert
         expect(mockFunction).toHaveBeenCalledTimes(1);
         expect(mockResJson).toHaveBeenCalledTimes(1);
+        expect(decorateResponse).toBeCalledTimes(1);
       });
       it("Responds as JSON if the response is an array", async () => {
         // Arrange
@@ -184,6 +187,7 @@ describe("Express Handler", () => {
         // Assert
         expect(mockFunction).toHaveBeenCalledTimes(1);
         expect(mockResJson).toHaveBeenCalledTimes(1);
+        expect(decorateResponse).toBeCalledTimes(1);
       });
       it("Responds as JSON if the response is a string that casts to JSON", async () => {
         // Arrange
@@ -202,6 +206,7 @@ describe("Express Handler", () => {
         // Assert
         expect(mockFunction).toHaveBeenCalledTimes(1);
         expect(mockResJson).toHaveBeenCalledTimes(1);
+        expect(decorateResponse).toBeCalledTimes(1);
       });
       it("Responds as JSON if the response has a .json() that returns an object", async () => {
         // Arrange
@@ -222,13 +227,27 @@ describe("Express Handler", () => {
         // Assert
         expect(mockFunction).toHaveBeenCalledTimes(1);
         expect(mockResJson).toHaveBeenCalledTimes(1);
+        expect(decorateResponse).toBeCalledTimes(1);
       });
-      it.todo(
-        "Responds as HTML if the response is a string that starts with <",
-        async () => {
-          //
-        },
-      );
+      it("Responds as HTML if the response is a string that starts with <", async () => {
+        // Arrange
+        const mockFunction = vi.fn(() => "<html></html>");
+        const handler = expressHandler(mockFunction);
+        const req = {};
+        const mockResSend = vi.fn();
+        const res = {
+          send: mockResSend,
+          on: vi.fn(),
+          status: vi.fn(() => res),
+        };
+        const next = () => {};
+        // Act
+        await handler(req, res, next);
+        // Assert
+        expect(mockFunction).toHaveBeenCalledTimes(1);
+        expect(mockResSend).toHaveBeenCalledTimes(1);
+        expect(decorateResponse).toBeCalledTimes(1);
+      });
       it.todo(
         "Responds as text if the response is a string that does not start with <",
         async () => {
