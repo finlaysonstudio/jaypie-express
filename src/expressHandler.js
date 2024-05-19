@@ -3,8 +3,8 @@ import {
   JAYPIE,
   jaypieHandler,
   log as publicLogger,
-  ConfigurationError,
   UnhandledError,
+  validate as validateIs,
 } from "@jaypie/core";
 
 import getCurrentInvokeUuid from "./getCurrentInvokeUuid.adapter.js";
@@ -25,12 +25,7 @@ const expressHandler = (
   //
   // Validate
   //
-
-  if (typeof handler !== "function") {
-    throw new ConfigurationError(
-      "The handler responding to the request encountered a configuration error",
-    );
-  }
+  validateIs.function(handler);
 
   //
   //
