@@ -77,6 +77,27 @@ describe("Express Handler", () => {
       expect(() => expressHandler(null)).toThrow();
       expect(() => expressHandler(undefined)).toThrow();
     });
+    it("Throws if passed an invalid locals object", () => {
+      // Arrange
+      const mockFunction = vi.fn();
+      // Act
+      // Assert
+      expect(() =>
+        expressHandler(mockFunction, { locals: true }),
+      ).toThrowJaypieError();
+      expect(() =>
+        expressHandler(mockFunction, { locals: 42 }),
+      ).toThrowJaypieError();
+      expect(() =>
+        expressHandler(mockFunction, { locals: "string" }),
+      ).toThrowJaypieError();
+      expect(() =>
+        expressHandler(mockFunction, { locals: [] }),
+      ).toThrowJaypieError();
+      expect(() =>
+        expressHandler(mockFunction, { locals: null }),
+      ).toThrowJaypieError();
+    });
     it("Will catch an unhandled thrown error", async () => {
       const mockFunction = vi.fn(() => {
         throw new Error("Sorpresa!");
@@ -357,7 +378,37 @@ describe("Express Handler", () => {
       });
     });
     describe("Locals", () => {
-      it.todo("Sets values in res.locals by running functions during setup");
+      it("Sets values in res.locals by running functions during setup", async () => {
+        // Arrange
+        const mockFunction = vi.fn();
+        const mockLocalFunction = vi.fn();
+        const mockLocalAsyncFunction = vi.fn();
+        mockLocalFunction.mockReturnValue("function");
+        mockLocalAsyncFunction.mockResolvedValue("async/await");
+        const handler = expressHandler(mockFunction, {
+          locals: {
+            key: "value",
+            fn: mockLocalFunction,
+            asyncFn: mockLocalAsyncFunction,
+          },
+        });
+        const req = {};
+        const res = {
+          on: vi.fn(),
+        };
+        const next = () => {};
+        // Act
+        await handler(req, res, next);
+        // Assert
+        expect(mockFunction).toHaveBeenCalledTimes(1);
+        expect(mockLocalFunction).toHaveBeenCalledTimes(1);
+        expect(mockLocalAsyncFunction).toHaveBeenCalledTimes(1);
+        expect(req.locals).toBeDefined();
+        expect(req.locals).toBeObject();
+        expect(req.locals.key).toBe("value");
+        expect(req.locals.fn).toBe("function");
+        expect(req.locals.asyncFn).toBe("async/await");
+      });
     });
     describe("Unavailable mode", () => {
       it("Works as normal when process.env.PROJECT_UNAVAILABLE is set to false", async () => {

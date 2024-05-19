@@ -1,4 +1,5 @@
 import {
+  force,
   HTTP,
   JAYPIE,
   jaypieHandler,
@@ -19,13 +20,16 @@ import summarizeResponse from "./summarizeResponse.helper.js";
 
 const expressHandler = (
   handler,
-  { locals, name, setup, teardown, unavailable, validate } = {},
+  { locals, name, setup = [], teardown = [], unavailable, validate } = {},
 ) => {
   //
   //
   // Validate
   //
   validateIs.function(handler);
+  validateIs.optional.object(locals);
+  setup = force.array(setup); // allows a single item
+  teardown = force.array(teardown); // allows a single item
 
   //
   //
@@ -33,8 +37,6 @@ const expressHandler = (
   //
 
   let jaypieFunction;
-
-  // TODO: setup locals if passed in
 
   return async (req, res, ...params) => {
     // * This is the first line of code that runs when a request is received
@@ -54,12 +56,38 @@ const expressHandler = (
       lib: JAYPIE.LIB.EXPRESS,
     });
 
+    // Set req.locals if it doesn't exist
+    if (!req.locals) req.locals = {};
+    if (!req.locals._jaypie) req.locals._jaypie = {};
+
+    // Set res.locals if it doesn't exist
+    if (!res.locals) res.locals = {};
+    if (!res.locals._jaypie) res.locals._jaypie = {};
+
+    // TODO: Intercept the original res.json, res.send, and res.end
+    // TODO: Warn if they are used
+
     //
     //
     // Preprocess
     //
 
-    // TODO: pass locals setup to jaypieHandler
+    if (locals) {
+      // Locals
+      const keys = Object.keys(locals);
+      if (keys.length > 0) {
+        log.trace(`Handler locals`);
+        for (let i = 0; i < keys.length; i += 1) {
+          const key = keys[i];
+          if (typeof locals[key] === "function") {
+            // eslint-disable-next-line no-await-in-loop
+            req.locals[key] = await locals[key](req, res);
+          } else {
+            req.locals[key] = locals[key];
+          }
+        }
+      }
+    }
 
     if (!jaypieFunction) {
       // Initialize after logging is set up
@@ -71,17 +99,6 @@ const expressHandler = (
         validate,
       });
     }
-
-    // Set req.locals if it doesn't exist
-    if (!req.locals) req.locals = {};
-    if (!req.locals._jaypie) req.locals._jaypie = {};
-
-    // Set res.locals if it doesn't exist
-    if (!res.locals) res.locals = {};
-    if (!res.locals._jaypie) res.locals._jaypie = {};
-
-    // TODO: Intercept the original res.json, res.send, and res.end
-    // TODO: Warn if they are used
 
     let response;
     let status;
