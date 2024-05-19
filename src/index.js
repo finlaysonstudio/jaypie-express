@@ -1,6 +1,1 @@
-//
-//
-// Export
-//
-
-export default {};
+export { default as expressHandler } from "./expressHandler.js";
