@@ -146,7 +146,7 @@ const expressHandler = (
 
     // Log response
     log.info.var({
-      res: summarizeResponse(res),
+      res: summarizeResponse(res, { body: response }),
     });
 
     // Clean up the public logger
