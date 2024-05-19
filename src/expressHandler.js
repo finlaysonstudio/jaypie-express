@@ -1,4 +1,5 @@
 import {
+  HTTP,
   JAYPIE,
   jaypieHandler,
   log as publicLogger,
@@ -139,16 +140,18 @@ const expressHandler = (
           } else {
             res.json(response);
           }
-        }
-        if (typeof response === "string") {
+        } else if (typeof response === "string") {
           try {
             res.json(JSON.parse(response));
           } catch (error) {
             res.send(response);
           }
+        } else {
+          res.send(response);
         }
       } else {
-        //
+        // No response
+        res.status(HTTP.CODE.NO_CONTENT).send();
       }
     } catch (error) {
       log.fatal("Express encountered an error while sending the response");

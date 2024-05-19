@@ -248,23 +248,65 @@ describe("Express Handler", () => {
         expect(mockResSend).toHaveBeenCalledTimes(1);
         expect(decorateResponse).toBeCalledTimes(1);
       });
-      it.todo(
-        "Responds as text if the response is a string that does not start with <",
-        async () => {
-          //
-        },
-      );
-      it.todo("Responds as no content if the response is null", async () => {
-        //
+      it("Responds as no content if the response is null", async () => {
+        // Arrange
+        const mockFunction = vi.fn(() => null);
+        const handler = expressHandler(mockFunction);
+        const req = {};
+        const mockResSend = vi.fn();
+        const res = {
+          send: mockResSend,
+          on: vi.fn(),
+          status: vi.fn(() => res),
+        };
+        const next = () => {};
+        // Act
+        await handler(req, res, next);
+        // Assert
+        expect(res.status).toBeCalled();
+        expect(res.status).toBeCalledWith(HTTP.CODE.NO_CONTENT);
+        expect(res.send).toBeCalled();
+        expect(res.send).toBeCalledWith(); // No arguments, which is different from undefined
       });
-      it.todo(
-        "Responds as no content if the response is undefined",
-        async () => {
-          //
-        },
-      );
-      it.todo("Responds as no content if the response is false", async () => {
-        //
+      it("Responds as no content if the response is undefined", async () => {
+        // Arrange
+        const mockFunction = vi.fn(() => undefined);
+        const handler = expressHandler(mockFunction);
+        const req = {};
+        const mockResSend = vi.fn();
+        const res = {
+          send: mockResSend,
+          on: vi.fn(),
+          status: vi.fn(() => res),
+        };
+        const next = () => {};
+        // Act
+        await handler(req, res, next);
+        // Assert
+        expect(res.status).toBeCalled();
+        expect(res.status).toBeCalledWith(HTTP.CODE.NO_CONTENT);
+        expect(res.send).toBeCalled();
+        expect(res.send).toBeCalledWith(); // No arguments, which is different from undefined
+      });
+      it("Responds as no content if the response is false", async () => {
+        // Arrange
+        const mockFunction = vi.fn(() => false);
+        const handler = expressHandler(mockFunction);
+        const req = {};
+        const mockResSend = vi.fn();
+        const res = {
+          send: mockResSend,
+          on: vi.fn(),
+          status: vi.fn(() => res),
+        };
+        const next = () => {};
+        // Act
+        await handler(req, res, next);
+        // Assert
+        expect(res.status).toBeCalled();
+        expect(res.status).toBeCalledWith(HTTP.CODE.NO_CONTENT);
+        expect(res.send).toBeCalled();
+        expect(res.send).toBeCalledWith(); // No arguments, which is different from undefined
       });
       it.todo("Responds as created if the response is true", async () => {
         //

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { log } from "@jaypie/core";
+import { HTTP, log } from "@jaypie/core";
 import { restoreLog, spyLog } from "@jaypie/testkit";
 import express from "express";
 import request from "supertest";
@@ -128,6 +128,17 @@ describe("Project handler function", () => {
       // The count of keys in each call should be 1
       expect(Object.keys(log.info.var.mock.calls[0][0]).length).toEqual(1);
       expect(Object.keys(log.info.var.mock.calls[1][0]).length).toEqual(1);
+    });
+    it("Returning no content", async () => {
+      const mockFunction = vi.fn(() => null);
+      const handler = expressHandler(mockFunction, {
+        name: "handler",
+      });
+      const app = express();
+      app.use(handler);
+      // Make a request
+      const res = await request(app).get("/");
+      expect(res.status).toEqual(HTTP.CODE.NO_CONTENT);
     });
   });
 });
