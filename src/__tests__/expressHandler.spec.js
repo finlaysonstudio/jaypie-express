@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { HTTP, NotFoundError } from "@jaypie/core";
+import { HTTP, InternalError, NotFoundError } from "@jaypie/core";
 
 import getCurrentInvokeUuid from "../getCurrentInvokeUuid.adapter.js";
 import decorateResponse from "../decorateResponse.helper.js";
@@ -367,14 +367,71 @@ describe("Express Handler", () => {
         expect(res.send).toBeCalled();
         expect(res.send).toBeCalledWith(12);
       });
-      it.todo("Will not override res.json() if it was sent", async () => {
-        //
+      it("Will not override res.json() if it was sent", async () => {
+        // Arrange
+        const mockFunction = vi.fn((req, res) => {
+          res.json({ key: "value" });
+          return false;
+        });
+        const handler = expressHandler(mockFunction);
+        const req = {};
+        const res = {
+          json: vi.fn(),
+          on: vi.fn(),
+          send: vi.fn(),
+          status: vi.fn(() => res),
+        };
+        const next = () => {};
+        // Act
+        await handler(req, res, next);
+        // Assert
+        expect(res.json).toHaveBeenCalledTimes(1);
+        expect(res.send).toHaveBeenCalledTimes(0);
       });
-      it.todo("Will not override res.send() if it was sent", async () => {
-        //
+      it("Will not override res.send() if it was sent", async () => {
+        // Arrange
+        const mockFunction = vi.fn((req, res) => {
+          res.send("<html></html>");
+          return { key: "value" };
+        });
+        const handler = expressHandler(mockFunction);
+        const req = {};
+        const res = {
+          json: vi.fn(),
+          on: vi.fn(),
+          send: vi.fn(),
+          status: vi.fn(() => res),
+        };
+        const next = () => {};
+        // Act
+        await handler(req, res, next);
+        // Assert
+        expect(res.json).toHaveBeenCalledTimes(0);
+        expect(res.send).toHaveBeenCalledTimes(1);
       });
-      it.todo("Will not override res.status() if it was sent", async () => {
-        //
+      it("Will not override res.status() if it was sent", async () => {
+        // Arrange
+        const mockFunction = vi.fn((req, res) => {
+          res.status(404).send("<html></html>");
+          throw new InternalError();
+        });
+        const handler = expressHandler(mockFunction);
+        const req = {};
+        const res = {
+          json: vi.fn(),
+          on: vi.fn(),
+          send: vi.fn(),
+          status: vi.fn(() => res),
+        };
+        const next = () => {};
+        // Act
+        await handler(req, res, next);
+        // Assert
+        expect(res.json).toHaveBeenCalledTimes(0);
+        expect(res.send).toHaveBeenCalledTimes(1);
+        expect(res.send).toHaveBeenCalledWith("<html></html>");
+        expect(res.status).toHaveBeenCalledTimes(1);
+        expect(res.status).toHaveBeenCalledWith(404);
       });
     });
     describe("Locals", () => {

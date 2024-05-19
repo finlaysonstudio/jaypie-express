@@ -64,8 +64,40 @@ const expressHandler = (
     if (!res.locals) res.locals = {};
     if (!res.locals._jaypie) res.locals._jaypie = {};
 
-    // TODO: Intercept the original res.json, res.send, and res.end
-    // TODO: Warn if they are used
+    const originalRes = {
+      attemptedCall: undefined,
+      attemptedParams: undefined,
+      end: res.end,
+      json: res.json,
+      send: res.send,
+      status: res.status,
+      statusSent: false,
+    };
+    res.end = (...params) => {
+      originalRes.attemptedCall = originalRes.end;
+      originalRes.attemptedParams = params;
+      log.warn(
+        "[jaypie] Illegal call to res.end(); prefer Jaypie response conventions",
+      );
+    };
+    res.json = (...params) => {
+      originalRes.attemptedCall = originalRes.json;
+      originalRes.attemptedParams = params;
+      log.warn(
+        "[jaypie] Illegal call to res.json(); prefer Jaypie response conventions",
+      );
+    };
+    res.send = (...params) => {
+      originalRes.attemptedCall = originalRes.send;
+      originalRes.attemptedParams = params;
+      log.warn(
+        "[jaypie] Illegal call to res.send(); prefer Jaypie response conventions",
+      );
+    };
+    res.status = (...params) => {
+      originalRes.statusSent = true;
+      return originalRes.status(...params);
+    };
 
     //
     //
@@ -141,37 +173,58 @@ const expressHandler = (
     // Postprocess
     //
 
+    // Restore original res functions
+    res.end = originalRes.end;
+    res.json = originalRes.json;
+    res.send = originalRes.send;
+    res.status = originalRes.status;
+
+    // Decorate response
     decorateResponse(res, { handler: name });
 
+    // Send response
     try {
       // Status
-      if (status) {
+      if (status && !originalRes.statusSent) {
         res.status(status);
       }
 
-      // Body
-      if (response) {
-        if (typeof response === "object") {
-          if (typeof response.json === "function") {
-            res.json(response.json());
+      if (!originalRes.attemptedCall) {
+        // Body
+        if (response) {
+          if (typeof response === "object") {
+            if (typeof response.json === "function") {
+              res.json(response.json());
+            } else {
+              res.json(response);
+            }
+          } else if (typeof response === "string") {
+            try {
+              res.json(JSON.parse(response));
+            } catch (error) {
+              res.send(response);
+            }
+          } else if (response === true) {
+            res.status(HTTP.CODE.CREATED);
+            res.send();
           } else {
-            res.json(response);
-          }
-        } else if (typeof response === "string") {
-          try {
-            res.json(JSON.parse(response));
-          } catch (error) {
             res.send(response);
           }
-        } else if (response === true) {
-          res.status(HTTP.CODE.CREATED);
-          res.send();
         } else {
-          res.send(response);
+          // No response
+          res.status(HTTP.CODE.NO_CONTENT).send();
         }
       } else {
-        // No response
-        res.status(HTTP.CODE.NO_CONTENT).send();
+        // Resolve illegal call to res.end(), res.json(), or res.send()
+        log.debug("[jaypie] Resolving illegal call to res");
+        log.var({
+          attemptedCall: {
+            name: originalRes.attemptedCall.name,
+            params: originalRes.attemptedParams,
+          },
+        });
+        // Call the original function with the original parameters and the original `this` (res)
+        originalRes.attemptedCall.call(res, ...originalRes.attemptedParams);
       }
     } catch (error) {
       log.fatal("Express encountered an error while sending the response");
