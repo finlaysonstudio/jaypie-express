@@ -409,6 +409,33 @@ describe("Express Handler", () => {
         expect(req.locals.fn).toBe("function");
         expect(req.locals.asyncFn).toBe("async/await");
       });
+      it("Sets locals after setup functions are called", async () => {
+        // Arrange
+        const mockFunction = vi.fn();
+        const mockLocalFunction = vi.fn();
+        const mockSetupFunction = vi.fn();
+        mockLocalFunction.mockReturnValue("function");
+        mockSetupFunction.mockReturnValue("setup");
+        const handler = expressHandler(mockFunction, {
+          locals: {
+            key: "value",
+            fn: mockLocalFunction,
+          },
+          setup: mockSetupFunction,
+        });
+        const req = {};
+        const res = {
+          on: vi.fn(),
+        };
+        const next = () => {};
+        // Act
+        await handler(req, res, next);
+        // Assert
+        expect(mockFunction).toHaveBeenCalledTimes(1);
+        expect(mockLocalFunction).toHaveBeenCalledTimes(1);
+        expect(mockSetupFunction).toHaveBeenCalledTimes(1);
+        expect(mockSetupFunction).toHaveBeenCalledBefore(mockLocalFunction);
+      });
     });
     describe("Unavailable mode", () => {
       it("Works as normal when process.env.PROJECT_UNAVAILABLE is set to false", async () => {

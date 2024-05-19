@@ -76,16 +76,19 @@ const expressHandler = (
       // Locals
       const keys = Object.keys(locals);
       if (keys.length > 0) {
-        log.trace(`Handler locals`);
-        for (let i = 0; i < keys.length; i += 1) {
-          const key = keys[i];
-          if (typeof locals[key] === "function") {
-            // eslint-disable-next-line no-await-in-loop
-            req.locals[key] = await locals[key](req, res);
-          } else {
-            req.locals[key] = locals[key];
+        const localsSetup = async () => {
+          libLogger.trace("[jaypie] Locals");
+          for (let i = 0; i < keys.length; i += 1) {
+            const key = keys[i];
+            if (typeof locals[key] === "function") {
+              // eslint-disable-next-line no-await-in-loop
+              req.locals[key] = await locals[key](req, res);
+            } else {
+              req.locals[key] = locals[key];
+            }
           }
-        }
+        };
+        setup.push(localsSetup);
       }
     }
 
