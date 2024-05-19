@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@codegenie/serverless-express": "^4.14.1",
-    "@jaypie/core": "^1.0.33",
+    "@jaypie/core": "^1.0.34",
     "@jaypie/testkit": "^1.0.19",
     "mock-express-response": "^0.3.0"
   },
