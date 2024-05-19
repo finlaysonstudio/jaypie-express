@@ -146,6 +146,9 @@ const expressHandler = (
           } catch (error) {
             res.send(response);
           }
+        } else if (response === true) {
+          res.status(HTTP.CODE.CREATED);
+          res.send();
         } else {
           res.send(response);
         }

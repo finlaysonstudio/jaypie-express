@@ -140,5 +140,16 @@ describe("Project handler function", () => {
       const res = await request(app).get("/");
       expect(res.status).toEqual(HTTP.CODE.NO_CONTENT);
     });
+    it("Returning created", async () => {
+      const mockFunction = vi.fn(() => true);
+      const handler = expressHandler(mockFunction, {
+        name: "handler",
+      });
+      const app = express();
+      app.use(handler);
+      // Make a request
+      const res = await request(app).get("/");
+      expect(res.status).toEqual(HTTP.CODE.CREATED);
+    });
   });
 });

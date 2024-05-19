@@ -308,8 +308,25 @@ describe("Express Handler", () => {
         expect(res.send).toBeCalled();
         expect(res.send).toBeCalledWith(); // No arguments, which is different from undefined
       });
-      it.todo("Responds as created if the response is true", async () => {
-        //
+      it("Responds as created if the response is true", async () => {
+        // Arrange
+        const mockFunction = vi.fn(() => true);
+        const handler = expressHandler(mockFunction);
+        const req = {};
+        const mockResSend = vi.fn();
+        const res = {
+          send: mockResSend,
+          on: vi.fn(),
+          status: vi.fn(() => res),
+        };
+        const next = () => {};
+        // Act
+        await handler(req, res, next);
+        // Assert
+        expect(res.status).toBeCalled();
+        expect(res.status).toBeCalledWith(HTTP.CODE.CREATED);
+        expect(res.send).toBeCalled();
+        expect(res.send).toBeCalledWith(); // No arguments, which is different from undefined
       });
       it("Lets express handle anything else", async () => {
         // Arrange
