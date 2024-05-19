@@ -29,6 +29,7 @@ vi.mock("../getCurrentInvokeUuid.adapter.js");
 beforeEach(() => {
   getCurrentInvokeUuid.mockReturnValue("MOCK_UUID");
   delete process.env.PROJECT_ENV;
+  delete process.env.PROJECT_VERSION;
 });
 
 afterEach(() => {
@@ -150,6 +151,14 @@ describe("Decorate response util", () => {
         expect(res.get(HTTP.HEADER.PROJECT.VERSION)).toBeUndefined();
         decorateResponse(res, {});
         expect(res.get(HTTP.HEADER.PROJECT.VERSION)).toBeUndefined();
+      });
+      it("Finds the version in the environment", () => {
+        process.env.PROJECT_VERSION = MOCK.VERSION;
+        const res = new MockExpressResponse();
+        expect(res.get(HTTP.HEADER.PROJECT.VERSION)).toBeUndefined();
+        decorateResponse(res);
+        expect(res.get(HTTP.HEADER.PROJECT.VERSION)).not.toBeUndefined();
+        expect(res.get(HTTP.HEADER.PROJECT.VERSION)).toEqual(MOCK.VERSION);
       });
     });
   });

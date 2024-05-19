@@ -6,7 +6,10 @@ import getCurrentInvokeUuid from "./getCurrentInvokeUuid.adapter.js";
 // Main
 //
 
-const decorateResponse = (res, { handler = "", version = "" } = {}) => {
+const decorateResponse = (
+  res,
+  { handler = "", version = process.env.PROJECT_VERSION } = {},
+) => {
   const log = publicLogger.lib({
     lib: JAYPIE.LIB.EXPRESS,
   });
