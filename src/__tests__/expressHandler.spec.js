@@ -148,7 +148,7 @@ describe("Express Handler", () => {
     });
   });
   describe("Features", () => {
-    it.todo("Sets the name of the name of the handler");
+    it.todo("Sets the name of the handler");
     it.todo("Tags the public logger with the handler name");
     describe("Automatic response", () => {
       it("Responds as JSON if the response is a pure object", async () => {
@@ -355,6 +355,9 @@ describe("Express Handler", () => {
       it.todo("Will not override res.status() if it was sent", async () => {
         //
       });
+    });
+    describe("Locals", () => {
+      it.todo("Sets values in res.locals by running functions during setup");
     });
     describe("Unavailable mode", () => {
       it("Works as normal when process.env.PROJECT_UNAVAILABLE is set to false", async () => {

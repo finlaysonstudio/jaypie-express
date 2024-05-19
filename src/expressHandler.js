@@ -39,6 +39,8 @@ const expressHandler = (
 
   let jaypieFunction;
 
+  // TODO: setup locals if passed in
+
   return async (req, res, ...params) => {
     // * This is the first line of code that runs when a request is received
 
