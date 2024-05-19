@@ -7,6 +7,7 @@ import {
 } from "@jaypie/core";
 
 import getCurrentInvokeUuid from "./getCurrentInvokeUuid.adapter.js";
+import decorateResponse from "./decorateResponse.helper.js";
 import summarizeRequest from "./summarizeRequest.helper.js";
 import summarizeResponse from "./summarizeResponse.helper.js";
 
@@ -142,7 +143,7 @@ const expressHandler = (
     // Postprocess
     //
 
-    // TODO: Decorate response headers
+    decorateResponse(res, { handler: name });
 
     // Log response
     log.info.var({

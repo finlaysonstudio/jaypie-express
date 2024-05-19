@@ -6,6 +6,7 @@ import express from "express";
 import request from "supertest";
 
 import getCurrentInvokeUuid from "../getCurrentInvokeUuid.adapter.js";
+import decorateResponse from "../decorateResponse.helper.js";
 
 // Subject
 import expressHandler from "../expressHandler.js";
@@ -16,6 +17,7 @@ import expressHandler from "../expressHandler.js";
 //
 
 vi.mock("../getCurrentInvokeUuid.adapter.js");
+vi.mock("../decorateResponse.helper.js");
 
 beforeEach(() => {
   getCurrentInvokeUuid.mockReturnValue("MOCK_UUID");
@@ -57,8 +59,7 @@ describe("Project handler function", () => {
       // The count of keys in each call should be 1
       expect(Object.keys(log.info.var.mock.calls[0][0]).length).toEqual(1);
       expect(Object.keys(log.info.var.mock.calls[1][0]).length).toEqual(1);
-      // TODO: Expect decorateResponse to have been called once
-      // expect(decorateResponse).toBeCalledTimes(1);
+      expect(decorateResponse).toBeCalledTimes(1);
     });
   });
 });
