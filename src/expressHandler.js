@@ -86,6 +86,7 @@ const expressHandler = (
     // TODO: Warn if they are used
 
     let response;
+    let status;
 
     try {
       libLogger.trace("[jaypie] Lambda execution");
@@ -98,7 +99,39 @@ const expressHandler = (
 
       response = await jaypieFunction(req, res, ...params);
 
-      // JSONate
+      //
+      //
+      // Error Handling
+      //
+    } catch (error) {
+      // In theory jaypieFunction has handled all errors
+      if (error.status) {
+        status = error.status;
+      }
+      if (typeof error.json === "function") {
+        response = error.json();
+      } else {
+        // This should never happen
+        const unhandledError = new UnhandledError();
+        response = unhandledError.json();
+        status = unhandledError.status;
+      }
+    }
+
+    //
+    //
+    // Postprocess
+    //
+
+    decorateResponse(res, { handler: name });
+
+    try {
+      // Status
+      if (status) {
+        res.status(status);
+      }
+
+      // Body
       if (response) {
         if (typeof response === "object") {
           if (typeof response.json === "function") {
@@ -117,37 +150,16 @@ const expressHandler = (
       } else {
         //
       }
-
-      //
-      //
-      // Error Handling
-      //
     } catch (error) {
-      // In theory jaypieFunction has handled all errors
-      if (error.status) {
-        res.status(error.status);
-      }
-      if (typeof error.json === "function") {
-        res.json(error.json());
-        response = error.json();
-      } else {
-        // This should never happen
-        const unhandledError = new UnhandledError();
-        res.json(unhandledError.json());
-        response = unhandledError.json();
-      }
+      log.fatal("Express encountered an error while sending the response");
+      log.var({ responseError: error });
     }
 
-    //
-    //
-    // Postprocess
-    //
-
-    decorateResponse(res, { handler: name });
-
     // Log response
+    const extras = {};
+    if (response) extras.body = response;
     log.info.var({
-      res: summarizeResponse(res, { body: response }),
+      res: summarizeResponse(res, extras),
     });
 
     // Clean up the public logger
