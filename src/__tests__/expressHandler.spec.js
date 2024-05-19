@@ -311,12 +311,24 @@ describe("Express Handler", () => {
       it.todo("Responds as created if the response is true", async () => {
         //
       });
-      it.todo(
-        "Coerces everything else into string as responds as text",
-        async () => {
-          //
-        },
-      );
+      it("Lets express handle anything else", async () => {
+        // Arrange
+        const mockFunction = vi.fn(() => 12);
+        const handler = expressHandler(mockFunction);
+        const req = {};
+        const mockResSend = vi.fn();
+        const res = {
+          send: mockResSend,
+          on: vi.fn(),
+          status: vi.fn(() => res),
+        };
+        const next = () => {};
+        // Act
+        await handler(req, res, next);
+        // Assert
+        expect(res.send).toBeCalled();
+        expect(res.send).toBeCalledWith(12);
+      });
       it.todo("Will not override res.json() if it was sent", async () => {
         //
       });
