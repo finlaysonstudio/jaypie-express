@@ -1,4 +1,4 @@
-import { HTTP } from "@jaypie/core";
+import { HTTP, JAYPIE } from "@jaypie/core";
 import MockExpressResponse from "mock-express-response";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -73,14 +73,14 @@ describe("Decorate response util", () => {
         const res = new MockExpressResponse();
         expect(res.get(HTTP.HEADER.POWERED_BY)).toBeUndefined();
         decorateResponse(res);
-        expect(res.get(HTTP.HEADER.POWERED_BY)).toEqual("knowdev.studio");
+        expect(res.get(HTTP.HEADER.POWERED_BY)).toEqual(JAYPIE.LIB.EXPRESS);
       });
       it("Adds the powered by and overrides the Express default", () => {
         const res = new MockExpressResponse();
         res.set(HTTP.HEADER.POWERED_BY, "Express");
         expect(res.get(HTTP.HEADER.POWERED_BY)).not.toBeUndefined();
         decorateResponse(res);
-        expect(res.get(HTTP.HEADER.POWERED_BY)).toEqual("knowdev.studio");
+        expect(res.get(HTTP.HEADER.POWERED_BY)).toEqual(JAYPIE.LIB.EXPRESS);
       });
       it("Will not add powered by if one exists", () => {
         const res = new MockExpressResponse();
