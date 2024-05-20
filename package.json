@@ -31,6 +31,7 @@
     "test:spec:decorateResponse.helper": "vitest run ./src/__tests__/decorateResponse.helper.spec.js",
     "test:spec:expressHandler": "vitest run ./src/__tests__/expressHandler.spec.js",
     "test:spec:getCurrentInvokeUuid.adapter": "vitest run ./src/__tests__/getCurrentInvokeUuid.adapter.spec.js",
+    "test:spec:http.handler": "vitest run ./src/__tests__/http.handler.spec.js",
     "test:spec:index": "vitest run ./src/__tests__/index.spec.js",
     "test:spec:summarizeRequest.helper": "vitest run ./src/__tests__/summarizeRequest.helper.spec.js",
     "test:spec:summarizeResponse.helper": "vitest run ./src/__tests__/summarizeResponse.helper.spec.js",
