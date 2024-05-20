@@ -18,16 +18,6 @@ import expressHandler from "./expressHandler.js";
 
 //
 //
-// Constants
-//
-
-//
-//
-// Helper Functions
-//
-
-//
-//
 // Main
 //
 
@@ -39,9 +29,6 @@ const http = (statusCode = HTTP.CODE.OK, context = {}) => {
 
   // Return a function that will be used as an express route
   return expressHandler(async (req, res) => {
-    // Set up response
-    const response = { res: { statusCode } };
-
     // Map the most throwable status codes to errors and throw them!
     const error = {
       [HTTP.CODE.BAD_REQUEST]: BadRequestError,
@@ -72,27 +59,9 @@ const http = (statusCode = HTTP.CODE.OK, context = {}) => {
       );
     }
 
-    // Made status codes to messages; if the status code is not found it will be omitted
-    const statusMessage = {
-      [HTTP.CODE.OK]: "OK",
-      [HTTP.CODE.NO_CONTENT]: "No Content",
-      // Not including error codes because they are handled above
-    };
-
-    // Match the status message to the status code; if the status code is not found it will be omitted because the map will return undefined
-    response.res.statusMessage = statusMessage[statusCode];
-
-    // Warn if the message is not found
-    if (!response.res.statusMessage) {
-      log.warn(
-        `@knowdev/express: status code ${statusCode} not found in statusMessage map`,
-      );
-      log.trace.var({ statusMessage });
-    }
-
     // Send the response
     res.status(statusCode);
-    return response;
+    return statusCode === HTTP.CODE.NO_CONTENT ? null : {};
   }, context);
 };
 

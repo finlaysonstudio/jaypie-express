@@ -95,7 +95,7 @@ const expressHandler = (
       );
     };
     res.status = (...params) => {
-      originalRes.statusSent = true;
+      originalRes.statusSent = params;
       return originalRes.status(...params);
     };
 
@@ -136,7 +136,7 @@ const expressHandler = (
     }
 
     let response;
-    let status;
+    let status = HTTP.CODE.OK;
 
     try {
       libLogger.trace("[jaypie] Lambda execution");
@@ -182,13 +182,13 @@ const expressHandler = (
     // Decorate response
     decorateResponse(res, { handler: name });
 
+    // Allow the sent status to override the status in the response
+    if (originalRes.statusSent) {
+      status = originalRes.statusSent;
+    }
+
     // Send response
     try {
-      // Status
-      if (status && !originalRes.statusSent) {
-        res.status(status);
-      }
-
       if (!originalRes.attemptedCall) {
         // Body
         if (response) {
@@ -196,19 +196,18 @@ const expressHandler = (
             if (typeof response.json === "function") {
               res.json(response.json());
             } else {
-              res.json(response);
+              res.status(status).json(response);
             }
           } else if (typeof response === "string") {
             try {
-              res.json(JSON.parse(response));
+              res.status(status).json(JSON.parse(response));
             } catch (error) {
-              res.send(response);
+              res.status(status).send(response);
             }
           } else if (response === true) {
-            res.status(HTTP.CODE.CREATED);
-            res.send();
+            res.status(HTTP.CODE.CREATED).send();
           } else {
-            res.send(response);
+            res.status(status).send(response);
           }
         } else {
           // No response

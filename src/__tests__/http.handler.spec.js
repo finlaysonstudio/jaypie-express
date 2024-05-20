@@ -1,4 +1,4 @@
-import { HTTP, log } from "@jaypie/core";
+import { HTTP, JAYPIE, log } from "@jaypie/core";
 import { jsonApiErrorSchema } from "@jaypie/testkit";
 import express from "express";
 import request from "supertest";
@@ -47,7 +47,7 @@ describe("Http Handler", () => {
     // Make a request
     const res = await request(app).get("/");
     // Check the response
-    expect(res.headers["x-powered-by"]).toEqual("knowdev.studio");
+    expect(res.headers["x-powered-by"]).toEqual(JAYPIE.LIB.EXPRESS);
   });
   it("Returns 200 by default", async () => {
     // Setup express to use our route
@@ -103,12 +103,12 @@ describe("Http Handler", () => {
   it("Returns whatever you tell it", async () => {
     // Setup express to use our route
     const app = express();
-    const route = httpRoute(201);
+    const route = httpRoute(203);
     app.use(route);
     // Make a request
     const res = await request(app).get("/");
     // Check the response
-    expect(res.statusCode).toEqual(201);
+    expect(res.statusCode).toEqual(203);
   });
   describe("Logging and observability", () => {
     beforeEach(() => {
@@ -119,22 +119,6 @@ describe("Http Handler", () => {
       // Release the spy
       log.warn.mockRestore();
     });
-    it("Warns when it cannot map a message", async () => {
-      // Setup express to use our route
-      const app = express();
-      const route = httpRoute(299);
-      app.use(route);
-      // Make a request
-      const res = await request(app).get("/");
-      // Check the response
-      expect(res.statusCode).toEqual(299);
-      // Check the log
-      expect(log.warn).toHaveBeenCalledTimes(1);
-      // The _exact_ message doesn't matter, but we should start with @knowdev/express for now
-      expect(log.warn).toHaveBeenCalledWith(
-        "@knowdev/express: status code 299 not found in statusMessage map",
-      );
-    });
     it("Warns when it is an error that cannot be thrown", async () => {
       // Setup express to use our route
       const app = express();
@@ -144,15 +128,11 @@ describe("Http Handler", () => {
       const res = await request(app).get("/");
       // Check the response
       expect(res.statusCode).toEqual(499);
-      expect(log.warn).toHaveBeenCalledTimes(2);
+      expect(log.warn).toHaveBeenCalledTimes(1);
       // The _exact_ message doesn't matter, but we should start with @knowdev/express for now
       expect(log.warn).toHaveBeenNthCalledWith(
         1,
         "@knowdev/express: status code 499 not mapped as throwable",
-      );
-      expect(log.warn).toHaveBeenNthCalledWith(
-        2,
-        "@knowdev/express: status code 499 not found in statusMessage map",
       );
     });
   });
