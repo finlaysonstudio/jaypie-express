@@ -17,7 +17,6 @@ const echo = (context = {}) => {
 
   // Return a function that will be used as an express route
   return expressHandler(async (req) => {
-    console.log("req.body :>> ", req.body);
     return {
       req: summarizeRequest(req),
     };
