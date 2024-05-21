@@ -29,6 +29,7 @@
     "prepublish": "npm run build",
     "test": "vitest",
     "test:spec:decorateResponse.helper": "vitest run ./src/__tests__/decorateResponse.helper.spec.js",
+    "test:spec:echo.handler": "vitest run ./src/__tests__/echo.handler.spec.js",
     "test:spec:expressHandler": "vitest run ./src/__tests__/expressHandler.spec.js",
     "test:spec:getCurrentInvokeUuid.adapter": "vitest run ./src/__tests__/getCurrentInvokeUuid.adapter.spec.js",
     "test:spec:http.handler": "vitest run ./src/__tests__/http.handler.spec.js",
