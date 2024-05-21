@@ -124,23 +124,24 @@ const expressHandler = (
       }
     }
 
-    if (!jaypieFunction) {
-      // Initialize after logging is set up
-      jaypieFunction = jaypieHandler(handler, {
-        name,
-        setup,
-        teardown,
-        unavailable,
-        validate,
-      });
-    }
-
     let response;
     let status = HTTP.CODE.OK;
 
     try {
-      libLogger.trace("[jaypie] Lambda execution");
       log.info.var({ req: summarizeRequest(req) });
+
+      if (!jaypieFunction) {
+        // Initialize after logging is set up
+        jaypieFunction = jaypieHandler(handler, {
+          name,
+          setup,
+          teardown,
+          unavailable,
+          validate,
+        });
+      }
+
+      libLogger.trace("[jaypie] Express execution");
 
       //
       //
