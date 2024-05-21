@@ -8,7 +8,7 @@ import summarizeRequest from "./summarizeRequest.helper.js";
 // Main
 //
 
-const echo = (context = {}) => {
+const echoHandler = (context = {}) => {
   validate.object(context);
   // Give a default name if there isn't one
   if (!context.name) {
@@ -28,4 +28,4 @@ const echo = (context = {}) => {
 // Export
 //
 
-export default echo;
+export default echoHandler;

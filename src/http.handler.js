@@ -21,7 +21,7 @@ import expressHandler from "./expressHandler.js";
 // Main
 //
 
-const http = (statusCode = HTTP.CODE.OK, context = {}) => {
+const httpHandler = (statusCode = HTTP.CODE.OK, context = {}) => {
   // Give a default name if there isn't one
   if (!context.name) {
     context.name = "_http";
@@ -70,4 +70,4 @@ const http = (statusCode = HTTP.CODE.OK, context = {}) => {
 // Export
 //
 
-export default http;
+export default httpHandler;
