@@ -35,6 +35,7 @@
     "test:spec:getCurrentInvokeUuid.adapter": "vitest run ./src/__tests__/getCurrentInvokeUuid.adapter.spec.js",
     "test:spec:http.handler": "vitest run ./src/__tests__/http.handler.spec.js",
     "test:spec:index": "vitest run ./src/__tests__/index.spec.js",
+    "test:spec:routes": "vitest run ./src/__tests__/routes.spec.js",
     "test:spec:summarizeRequest.helper": "vitest run ./src/__tests__/summarizeRequest.helper.spec.js",
     "test:spec:summarizeResponse.helper": "vitest run ./src/__tests__/summarizeResponse.helper.spec.js",
     "test:spec:supertest": "vitest run ./src/__tests__/supertest.spec.js"
