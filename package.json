@@ -6,7 +6,7 @@
   "exports": {
     ".": {
       "default": {
-        "require": "./dist/module.cjs.js",
+        "require": "./dist/module.cjs",
         "default": "./src/index.js"
       }
     }
