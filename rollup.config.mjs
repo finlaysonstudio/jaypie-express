@@ -6,7 +6,7 @@ export default {
   input: "src/index.js", // Path to your main JavaScript file
   output: [
     {
-      file: "dist/module.cjs.js", // Output file for CommonJS
+      file: "dist/module.cjs", // Output file for CommonJS
       format: "cjs", // CommonJS format
     },
     {
