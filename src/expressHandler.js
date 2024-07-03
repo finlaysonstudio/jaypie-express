@@ -42,7 +42,11 @@ const expressHandler = (
     // * This is the first line of code that runs when a request is received
 
     // Update the public logger with the request ID
-    publicLogger.tag({ invoke: getCurrentInvokeUuid() });
+    const invokeUuid = getCurrentInvokeUuid();
+    if (invokeUuid) {
+      publicLogger.tag({ invoke: invokeUuid });
+      publicLogger.tag({ shortInvoke: invokeUuid.slice(0, 8) });
+    }
 
     // Very low-level, internal sub-trace details
     const libLogger = publicLogger.lib({
