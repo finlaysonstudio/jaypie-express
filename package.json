@@ -42,13 +42,13 @@
   },
   "dependencies": {
     "@codegenie/serverless-express": "^4.14.1",
-    "@jaypie/core": "^1.0.34",
+    "@jaypie/core": "^1.0.37",
     "@jaypie/testkit": "^1.0.19",
     "eslint-config-jaypie": "^1.0.7",
     "mock-express-response": "^0.3.0"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "eslint": "^8.57.0",
     "express": "^4.19.2",
