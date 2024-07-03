@@ -77,6 +77,7 @@ const expressHandler = (
       status: res.status,
       statusSent: false,
     };
+    // eslint-disable-next-line no-shadow
     res.end = (...params) => {
       originalRes.attemptedCall = originalRes.end;
       originalRes.attemptedParams = params;
@@ -84,6 +85,7 @@ const expressHandler = (
         "[jaypie] Illegal call to res.end(); prefer Jaypie response conventions",
       );
     };
+    // eslint-disable-next-line no-shadow
     res.json = (...params) => {
       originalRes.attemptedCall = originalRes.json;
       originalRes.attemptedParams = params;
@@ -91,6 +93,7 @@ const expressHandler = (
         "[jaypie] Illegal call to res.json(); prefer Jaypie response conventions",
       );
     };
+    // eslint-disable-next-line no-shadow
     res.send = (...params) => {
       originalRes.attemptedCall = originalRes.send;
       originalRes.attemptedParams = params;
@@ -98,6 +101,7 @@ const expressHandler = (
         "[jaypie] Illegal call to res.send(); prefer Jaypie response conventions",
       );
     };
+    // eslint-disable-next-line no-shadow
     res.status = (...params) => {
       originalRes.statusSent = params;
       return originalRes.status(...params);
