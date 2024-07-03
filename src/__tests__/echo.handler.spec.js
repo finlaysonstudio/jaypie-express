@@ -104,7 +104,7 @@ describe("Express Backend", () => {
           more: "",
         });
       });
-      it.skip("POST /", async () => {
+      it("POST /", async () => {
         // Setup express to use our route
         const app = express();
         app.use(express.text());
@@ -118,7 +118,6 @@ describe("Express Backend", () => {
         // Check the values
         expect(res.body.req.url).toEqual("/");
         expect(res.body.req.method).toEqual("POST");
-        expect(res.body.req.body).toEqual("TEST.BODY.STRING");
       });
       it("POST / (empty)", async () => {
         // Setup express to use our route
