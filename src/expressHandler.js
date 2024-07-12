@@ -41,6 +41,9 @@ const expressHandler = (
   return async (req, res, ...params) => {
     // * This is the first line of code that runs when a request is received
 
+    // Re-init the logger
+    publicLogger.init();
+
     // Update the public logger with the request ID
     const invokeUuid = getCurrentInvokeUuid();
     if (invokeUuid) {
@@ -117,9 +120,9 @@ const expressHandler = (
       const keys = Object.keys(locals);
       if (keys.length > 0) {
         const localsSetup = async () => {
-          libLogger.trace("[jaypie] Locals");
           for (let i = 0; i < keys.length; i += 1) {
             const key = keys[i];
+            libLogger.trace(`[jaypie] Locals: ${key}`);
             if (typeof locals[key] === "function") {
               // eslint-disable-next-line no-await-in-loop
               req.locals[key] = await locals[key](req, res);
