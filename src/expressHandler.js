@@ -47,6 +47,11 @@ const expressHandler = (
     const libLogger = publicLogger.lib({
       lib: JAYPIE.LIB.EXPRESS,
     });
+    // Top-level, important details that run at the same level as the main logger
+    const log = publicLogger.lib({
+      level: publicLogger.level,
+      lib: JAYPIE.LIB.EXPRESS,
+    });
 
     // Update the public logger with the request ID
     const invokeUuid = getCurrentInvokeUuid();
@@ -56,15 +61,24 @@ const expressHandler = (
       // TODO: in theory this is redundant
       libLogger.tag({ invoke: invokeUuid });
       libLogger.tag({ shortInvoke: invokeUuid.slice(0, 8) });
+      log.tag({ invoke: invokeUuid });
+      log.tag({ shortInvoke: invokeUuid.slice(0, 8) });
     }
 
-    libLogger.trace("[jaypie] Express init");
+    if (!name) {
+      // If handler has a name, use it
+      if (handler.name) {
+        name = handler.name;
+      } else {
+        name = JAYPIE.UNKNOWN;
+      }
+    }
+    publicLogger.tag({ handler: name });
+    // TODO: in theory this is redundant
+    libLogger.tag({ handler: name });
+    log.tag({ handler: name });
 
-    // Top-level, important details that run at the same level as the main logger
-    const log = publicLogger.lib({
-      level: publicLogger.level,
-      lib: JAYPIE.LIB.EXPRESS,
-    });
+    libLogger.trace("[jaypie] Express init");
 
     // Set req.locals if it doesn't exist
     if (!req.locals) req.locals = {};
