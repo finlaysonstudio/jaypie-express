@@ -43,18 +43,21 @@ const expressHandler = (
 
     // Re-init the logger
     publicLogger.init();
+    // Very low-level, internal sub-trace details
+    const libLogger = publicLogger.lib({
+      lib: JAYPIE.LIB.EXPRESS,
+    });
 
     // Update the public logger with the request ID
     const invokeUuid = getCurrentInvokeUuid();
     if (invokeUuid) {
       publicLogger.tag({ invoke: invokeUuid });
       publicLogger.tag({ shortInvoke: invokeUuid.slice(0, 8) });
+      // TODO: in theory this is redundant
+      libLogger.tag({ invoke: invokeUuid });
+      libLogger.tag({ shortInvoke: invokeUuid.slice(0, 8) });
     }
 
-    // Very low-level, internal sub-trace details
-    const libLogger = publicLogger.lib({
-      lib: JAYPIE.LIB.EXPRESS,
-    });
     libLogger.trace("[jaypie] Express init");
 
     // Top-level, important details that run at the same level as the main logger
