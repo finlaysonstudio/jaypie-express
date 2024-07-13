@@ -141,16 +141,14 @@ const expressHandler = (
     try {
       log.info.var({ req: summarizeRequest(req) });
 
-      if (!jaypieFunction) {
-        // Initialize after logging is set up
-        jaypieFunction = jaypieHandler(handler, {
-          name,
-          setup,
-          teardown,
-          unavailable,
-          validate,
-        });
-      }
+      // Initialize after logging is set up
+      jaypieFunction = jaypieHandler(handler, {
+        name,
+        setup,
+        teardown,
+        unavailable,
+        validate,
+      });
 
       libLogger.trace("[jaypie] Express execution");
 
