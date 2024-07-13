@@ -1,5 +1,5 @@
 import { HTTP, JAYPIE, log } from "@jaypie/core";
-import { jsonApiErrorSchema } from "@jaypie/testkit";
+import { jsonApiErrorSchema, restoreLog, spyLog } from "@jaypie/testkit";
 import express from "express";
 import request from "supertest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -113,11 +113,10 @@ describe("Http Handler", () => {
   describe("Logging and observability", () => {
     beforeEach(() => {
       // Spy on log.warn
-      vi.spyOn(log, "warn");
+      spyLog(log);
     });
     afterEach(() => {
-      // Release the spy
-      log.warn.mockRestore();
+      restoreLog(log);
     });
     it("Warns when it is an error that cannot be thrown", async () => {
       // Setup express to use our route
