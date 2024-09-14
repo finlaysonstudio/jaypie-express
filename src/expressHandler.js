@@ -18,14 +18,28 @@ import summarizeResponse from "./summarizeResponse.helper.js";
 // Main
 //
 
-const expressHandler = (
-  handler,
-  { locals, name, setup = [], teardown = [], unavailable, validate } = {},
-) => {
+const expressHandler = (handler, options = {}) => {
+  // If handler is an object and options is a function, swap them
+  if (typeof handler === "object" && typeof options === "function") {
+    const temp = handler;
+    handler = options;
+    options = temp;
+  }
+
   //
   //
   // Validate
   //
+  /* eslint-disable no-autofix/prefer-const */
+  let {
+    locals,
+    name,
+    setup = [],
+    teardown = [],
+    unavailable,
+    validate,
+  } = options;
+  /* eslint-enable no-autofix/prefer-const */
   validateIs.function(handler);
   validateIs.optional.object(locals);
   setup = force.array(setup); // allows a single item

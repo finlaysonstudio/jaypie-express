@@ -494,6 +494,26 @@ describe("Express Handler", () => {
         expect(mockSetupFunction).toHaveBeenCalledBefore(mockLocalFunction);
       });
     });
+    describe("Swap expressHandler Parameter Order", () => {
+      it("Works with the options object first", async () => {
+        const mockFunction = vi.fn();
+        const handler = expressHandler({ unavailable: true }, mockFunction);
+        const req = {};
+        const mockResJson = vi.fn();
+        const res = {
+          json: mockResJson,
+          on: vi.fn(),
+          status: vi.fn(() => res),
+        };
+        const next = () => {};
+        await handler(req, res, next);
+        expect(mockFunction).toHaveBeenCalledTimes(0);
+        expect(mockResJson).toHaveBeenCalledTimes(1);
+        const response = mockResJson.mock.calls[0][0];
+        expect(response).toBeJaypieError();
+        expect(response.errors[0].status).toBe(HTTP.CODE.UNAVAILABLE);
+      });
+    });
     describe("Unavailable mode", () => {
       it("Works as normal when process.env.PROJECT_UNAVAILABLE is set to false", async () => {
         process.env.PROJECT_UNAVAILABLE = "false";
