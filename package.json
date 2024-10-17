@@ -41,11 +41,11 @@
     "test:spec:supertest": "vitest run ./src/__tests__/supertest.spec.js"
   },
   "dependencies": {
-    "@codegenie/serverless-express": "^4.14.1",
-    "@jaypie/core": "^1.0.41"
+    "@codegenie/serverless-express": "^4.15.0",
+    "@jaypie/core": "^1.0.44"
   },
   "devDependencies": {
-    "@jaypie/testkit": "^1.0.20",
+    "@jaypie/testkit": "^1.0.29",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "eslint": "^8.57.0",
@@ -59,6 +59,6 @@
     "rollup-plugin-auto-external": "^2.0.0",
     "sort-package-json": "^2.10.0",
     "supertest": "^7.0.0",
-    "vitest": "^1.6.0"
+    "vitest": "^2.1.3"
   }
 }
